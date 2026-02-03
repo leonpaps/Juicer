@@ -15,16 +15,16 @@ class Feeder
     @angle = initial_angle  # Initial rotation
 
     # Base circle (stationary)
-    @base = Circle.new(radius: BASE_RADIUS, color: 'orange')
+    @base = Circle.new(radius: BASE_RADIUS, color: 'orange', z: 100)
 
     # Pivot circles at center
-    @white = Circle.new(radius: WHITE_RADIUS, color: 'white')
-    @orange = Circle.new(radius: ORANGE_RADIUS, color: 'orange')
+    @white = Circle.new(radius: WHITE_RADIUS, color: 'white', z: 101)
+    @orange = Circle.new(radius: ORANGE_RADIUS, color: 'orange', z: 102 )
 
     # Sockets: 3 small dark orange circles
     @socket_angles = [0, 2 * Math::PI / 3, 4 * Math::PI / 3] # 0°, 120°, 240°
     @sockets = @socket_angles.map do
-      Circle.new(radius: SOCKET_RADIUS, color: '#e56717', z: 2)
+      Circle.new(radius: SOCKET_RADIUS, color: '#e56717', z: 103)
     end
   end
 
