@@ -12,19 +12,19 @@ Grid.draw if debug
 left_squeezer  = Squeezer.new(680, 600)
 right_squeezer = Squeezer.new(1080, 600)
 
-# Feeders
+# Feeders with initial rotations
 left_feeder    = Feeder.new(725, 300, initial_angle: Math::PI / 1.7)
 right_feeder   = Feeder.new(1045, 300, initial_angle: Math::PI / 2.3)
 
+# Feeder hitboxes (for stopping gravity before snapping)
 left_feeder_hitbox  = FeederHitbox.new(left_feeder.cx, left_feeder.cy, 130)
 right_feeder_hitbox = FeederHitbox.new(right_feeder.cx, right_feeder.cy, 130)
 
 left_feeder_hitbox.draw
 right_feeder_hitbox.draw
 
-# Hitbox
+# Ground hitboxes
 hitbox = Hitbox.new(1400, 800, 300, 50, debug: debug)
-hitbox2 = Hitbox.new(800, 300, 150, 50, debug: debug)
 
 # Oranges
 oranges = []
@@ -37,15 +37,13 @@ Blade.new(880, 400).draw
 # Register draggables in DragHelper
 DragHelper.set_draggables(oranges)
 
-# Top-level event registration (required by Ruby2D)
+# Mouse events
 on :mouse_down do |event|
   DragHelper.mouse_down(event.x, event.y)
 end
-
 on :mouse_up do |_|
   DragHelper.mouse_up
 end
-
 on :mouse_move do |event|
   DragHelper.mouse_move(event.x, event.y)
 end
@@ -68,26 +66,39 @@ update do
     if hitbox.collide?(o)
       o.y = hitbox.y - o.radius
       o.vy = 0
-    elsif hitbox2.collide?(o) 
-      o.y = hitbox2.y - o.radius
-      o.vy = 0
     else
       o.update(Float::INFINITY)
     end
   end
 
+  # Snap oranges to feeder sockets
   oranges.each do |o|
-    if left_feeder_hitbox.collide?(o)
-        o.stop_falling
-    elsif right_feeder_hitbox.collide?(o)
-        o.stop_falling
-    else
-        o.update(Float::INFINITY) # gravity still applies
+    next if o.following_socket # Already attached
+
+    # Feeder hitbox ONLY disables falling
+    if left_feeder_hitbox.collide?(o) || right_feeder_hitbox.collide?(o)
+      o.stop_falling
+    end
+
+    [left_feeder, right_feeder].each do |f|
+      f.sockets.each do |s|
+        dx = o.x - s.x
+        dy = o.y - s.y
+        distance = Math.sqrt(dx*dx + dy*dy)
+        if distance <= o.radius + s.radius
+          o.following_socket = s
+          o.stop_drag
+          o.stop_falling
+          break
+        end
+      end
     end
   end
 
-  # Draw hitbox (debug only)
+  # Draw hitboxes (debug only)
   hitbox.draw
+  left_feeder_hitbox.draw
+  right_feeder_hitbox.draw
 end
 
 show
