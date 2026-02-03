@@ -120,17 +120,19 @@ update do
       oranges << Orange.new(1550, (rand * 50).to_i + 50)
 
       orange_segments << OrangeSegment.new(863, 290, 0)
-      orange_segments << OrangeSegment.new(870, 290, 180 )
+      orange_segments << OrangeSegment.new(880, 300, 180 )
 
       # spawn segments
       orange_segments.each do |seg|
+        # Update segment (falling or locked)
         seg.update
 
-        # Snap to sockets if touching
+        # Check collision with feeder sockets
         [left_feeder, right_feeder].each do |feeder|
-          feeder.sockets.each do |socket|
-            if !seg.locked && seg.collide_with_socket?(socket)
-              seg.snap_to(socket)
+          feeder.sockets.each_with_index do |socket, i|
+            next if seg.locked
+            if seg.collide_with_socket?(socket)
+              seg.snap_to(feeder, i)
             end
           end
         end
@@ -138,6 +140,12 @@ update do
     end
   end
   
+
+  orange_segments.each do |seg|
+    seg.update  # this now moves the image properly
+  end
+
+
   # clean up destroyed oranges
   oranges.reject!(&:deleted)
   DragHelper.set_draggables(oranges)
