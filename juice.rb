@@ -2,7 +2,7 @@ require 'ruby2d'
 
 Dir[File.join(__dir__, 'components', '*.rb')].each { |file| require file }
 
-debug = true
+debug =  false #true
 set width: 1780, height: 960, background: 'white'
 
 # Grid
@@ -30,7 +30,7 @@ hitbox = Hitbox.new(1400, 800, 300, 50, debug: debug)
 
 # Oranges
 oranges = []
-spawn_count = 0
+$spawn_count = 0
 
 
 orange_segments = []
@@ -55,20 +55,22 @@ on :mouse_move do |event|
   DragHelper.mouse_move(event.x, event.y)
 end
 
-update do
-  # Rotate squeezers and feeders
+# Update helper methods
+def rotate_components(left_squeezer, right_squeezer, left_feeder, right_feeder)
   left_squeezer.rotate(:counterclockwise)
   right_squeezer.rotate(:clockwise)
   left_feeder.rotate(:clockwise)
   right_feeder.rotate(:counterclockwise)
-  
-  # Draw everything
+end
+
+def draw_components(left_feeder, right_feeder, left_squeezer, right_squeezer)
   left_feeder.draw
   right_feeder.draw
   left_squeezer.draw
   right_squeezer.draw
-  
-  # Update oranges with gravity
+end
+
+def update_oranges_gravity(oranges, hitbox)
   oranges.each do |o|
     if hitbox.collide?(o)
       o.y = hitbox.y - o.radius
@@ -77,8 +79,9 @@ update do
       o.update(Float::INFINITY)
     end
   end
-  
-  # Snap oranges to feeder sockets
+end
+
+def snap_oranges_to_sockets(oranges, left_feeder, right_feeder, left_feeder_hitbox, right_feeder_hitbox)
   oranges.each do |o|
     next if o.following_socket # Already attached
     
@@ -101,14 +104,15 @@ update do
       end
     end
   end
-  
+end
+
+def handle_blade_collisions(oranges, blade, left_feeder, right_feeder, orange_segments, juice_bursts)
   oranges.each do |o|
     next if o.deleted
     
     if blade.collide?(o)
-      # After detecting blade collision and destroying the orange
+      # Find closest sockets from each feeder
       sockets = []
-
       [left_feeder, right_feeder].each do |feeder|
         closest_socket = feeder.sockets.min_by do |s|
           dx = o.x - s.x
@@ -135,47 +139,58 @@ update do
         initial_vx: 5
       )
 
-      # destroy orange
+      # Destroy orange
       o.destroy
 
-      oranges << Orange.new(1450 + (rand * 50 ).to_i , 50)
-      spawn_count += 1
+      # Spawn new orange
+      oranges << Orange.new(1450 + (rand * 50).to_i, 50)
+      $spawn_count += 1
 
-      if spawn_count > 2
-        oranges << Spanner.new(1600, 0 )
+      # Spawn spanner after 2 oranges
+      if $spawn_count > 2
+        oranges << Spanner.new(1600, 0)
       end
 
+      # Create juice burst
       juice_bursts << Juice.new(o.x, o.y, count: 30)
-
-      # spawn segments
-      orange_segments.each do |seg|
-        # Update segment (falling or locked)
-        seg.update
-      end
     end
   end
+end
 
+def update_orange_segments(orange_segments)
   orange_segments.each do |seg|
-    seg.update  # this now moves the image properly
+    seg.update
   end
+end
 
-  # clean up destroyed oranges
+def cleanup_destroyed_oranges(oranges)
   oranges.reject!(&:deleted)
   DragHelper.set_draggables(oranges)
-  # Remove deleted oranges from arrays + drag helper
-  oranges.reject!(&:deleted)
-  DragHelper.set_draggables(oranges)
-  
-  # Draw hitboxes (debug only)
+end
+
+def draw_hitboxes(hitbox, left_feeder_hitbox, right_feeder_hitbox)
   hitbox.draw
   left_feeder_hitbox.draw
   right_feeder_hitbox.draw
+end
 
-  # Update all juice bursts
+def update_juice_bursts(juice_bursts)
   juice_bursts.each { |j| j.update(Window.height) }
-
-  # Optionally remove empty bursts if you want
   juice_bursts.reject! { |j| j.drops.empty? }
+end
+
+update do
+  draw_components(left_feeder, right_feeder, left_squeezer, right_squeezer)
+  rotate_components(left_squeezer, right_squeezer, left_feeder, right_feeder)
+  update_oranges_gravity(oranges, hitbox)
+  snap_oranges_to_sockets(oranges, left_feeder, right_feeder, left_feeder_hitbox, right_feeder_hitbox)
+  
+  handle_blade_collisions(oranges, blade, left_feeder, right_feeder, orange_segments, juice_bursts)
+  update_orange_segments(orange_segments)
+  cleanup_destroyed_oranges(oranges)
+  
+  draw_hitboxes(hitbox, left_feeder_hitbox, right_feeder_hitbox)
+  update_juice_bursts(juice_bursts)
 end
 
 show
