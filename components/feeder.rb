@@ -3,7 +3,7 @@ require 'ruby2d'
 BASE_RADIUS = 150
 WHITE_RADIUS = 55
 ORANGE_RADIUS = 50
-DEFAULT_OFFSET = 10
+DEFAULT_OFFSET = 5
 
 class Feeder
   attr_accessor :cx, :cy
@@ -23,7 +23,7 @@ class Feeder
   end
 
   # Rotate base circle around pivot (small circles) — direction: :clockwise or :counterclockwise
-  def rotate(direction, speed = 0.02)
+  def rotate(direction, speed = 0.05)
     case direction
     when :clockwise
       @angle += speed
