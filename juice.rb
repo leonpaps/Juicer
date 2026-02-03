@@ -25,8 +25,8 @@ right_feeder_hitbox = FeederHitbox.new(right_feeder.cx, right_feeder.cy, 130)
 left_feeder_hitbox.draw
 right_feeder_hitbox.draw
 
-# Ground hitboxes
-hitbox = Hitbox.new(1400, 800, 300, 50, debug: debug)
+# Ground shelf
+shelf = Shelf.new(1400, 800, 300, 50, debug: debug)
 
 # Oranges
 oranges = []
@@ -70,10 +70,10 @@ def draw_components(left_feeder, right_feeder, left_squeezer, right_squeezer)
   right_squeezer.draw
 end
 
-def update_oranges_gravity(oranges, hitbox)
+def update_oranges_gravity(oranges, shelf)
   oranges.each do |o|
-    if hitbox.collide?(o)
-      o.y = hitbox.y - o.radius
+    if shelf.collide?(o)
+      o.y = shelf.y - o.radius
       o.vy = 0
     else
       o.update(Float::INFINITY)
@@ -168,8 +168,8 @@ def cleanup_destroyed_oranges(oranges)
   DragHelper.set_draggables(oranges)
 end
 
-def draw_hitboxes(hitbox, left_feeder_hitbox, right_feeder_hitbox)
-  hitbox.draw
+def draw_hitboxes(shelf, left_feeder_hitbox, right_feeder_hitbox)
+  shelf.draw
   left_feeder_hitbox.draw
   right_feeder_hitbox.draw
 end
@@ -182,14 +182,14 @@ end
 update do
   draw_components(left_feeder, right_feeder, left_squeezer, right_squeezer)
   rotate_components(left_squeezer, right_squeezer, left_feeder, right_feeder)
-  update_oranges_gravity(oranges, hitbox)
+  update_oranges_gravity(oranges, shelf)
   snap_oranges_to_sockets(oranges, left_feeder, right_feeder, left_feeder_hitbox, right_feeder_hitbox)
   
   handle_blade_collisions(oranges, blade, left_feeder, right_feeder, orange_segments, juice_bursts)
   update_orange_segments(orange_segments)
   cleanup_destroyed_oranges(oranges)
   
-  draw_hitboxes(hitbox, left_feeder_hitbox, right_feeder_hitbox)
+  draw_hitboxes(shelf, left_feeder_hitbox, right_feeder_hitbox)
   update_juice_bursts(juice_bursts)
 end
 

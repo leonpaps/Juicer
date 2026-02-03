@@ -1,6 +1,6 @@
 require 'ruby2d'
 
-class Hitbox
+class Shelf
   attr_accessor :x, :y, :width, :height
   
   def initialize(x, y, width, height, debug: false)
@@ -21,7 +21,7 @@ class Hitbox
     
   end
   
-  # Check if an orange has hit this hitbox
+  # Check if an orange has hit this shelf
   def collide?(orange)
     ox, oy = orange.x, orange.y + orange.radius
     ox >= @x && ox <= (@x + @width) && oy >= @y && oy <= (@y + @height)
