@@ -11,8 +11,16 @@ Grid.draw if debug
 # Components
 left_squeezer  = Squeezer.new(680, 600)
 right_squeezer = Squeezer.new(1080, 600)
+
+# Feeders
 left_feeder    = Feeder.new(725, 300)
 right_feeder   = Feeder.new(1045, 300)
+
+left_feeder_hitbox  = FeederHitbox.new(left_feeder.cx, left_feeder.cy, 130)
+right_feeder_hitbox = FeederHitbox.new(right_feeder.cx, right_feeder.cy, 130)
+
+left_feeder_hitbox.draw
+right_feeder_hitbox.draw
 
 # Hitbox
 hitbox = Hitbox.new(1400, 800, 300, 50, debug: debug)
@@ -65,6 +73,16 @@ update do
       o.vy = 0
     else
       o.update(Float::INFINITY)
+    end
+  end
+
+  oranges.each do |o|
+    if left_feeder_hitbox.collide?(o)
+        o.stop_falling
+    elsif right_feeder_hitbox.collide?(o)
+        o.stop_falling
+    else
+        o.update(Float::INFINITY) # gravity still applies
     end
   end
 

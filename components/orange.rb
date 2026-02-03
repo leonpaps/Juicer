@@ -14,6 +14,7 @@ class Orange
     @radius = radius
     @vy = 0
     @dragging = false
+    @falling = true
 
     @shadow = Circle.new(x: @x + SHADOW_OFFSET_X, y: @y + SHADOW_OFFSET_Y, radius: @radius, color: SHADOW_COLOR, z: 0)
     @circle = Circle.new(x: @x, y: @y, radius: @radius, color: 'orange', z: 1)
@@ -25,12 +26,25 @@ class Orange
     Math.sqrt(dx*dx + dy*dy) <= @radius
   end
 
-  def start_drag; @dragging = true; @vy = 0; end
-  def stop_drag; @dragging = false; end
+  def stop_falling
+    @falling = false
+  end
+
+  def start_drag
+    @dragging = true
+    @falling = false
+    @vy = 0
+  end
+
+  def stop_drag
+    @falling = true
+    @dragging = false
+  end
+
   def drag_to(mx, my); @x = mx; @y = my; update_graphics; end
 
   def update(hitbox_y)
-    unless @dragging
+    if @falling
       @vy += GRAVITY
       @y += @vy
 
