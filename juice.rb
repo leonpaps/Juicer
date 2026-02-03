@@ -96,6 +96,7 @@ update do
       end
     end
   end
+  
   oranges.each do |o|
     next if o.deleted
     
@@ -115,8 +116,11 @@ update do
       # destroy orange
       o.destroy
 
+      # new orange
+      oranges << Orange.new(1550, (rand * 50).to_i + 50)
+
       orange_segments << OrangeSegment.new(863, 290, 0)
-      orange_segments << OrangeSegment.new(863, 290, Math::PI )
+      orange_segments << OrangeSegment.new(870, 290, 180 )
 
       # spawn segments
       orange_segments.each do |seg|

@@ -6,12 +6,13 @@ class OrangeSegment
 
   GRAVITY = 0.5
 
-  def initialize(x, y, radius: 30, rotation)
+  def initialize(x, y, rotation = 0, radius: 30)
     @x = x
     @y = y
     @radius = radius
     @vy = 0
-    @locked = false  # becomes true once it snaps to a socket
+    @locked = false
+    @rotation = rotation  # initial in degrees
 
     # Image of segment
     @image = Image.new(
@@ -29,9 +30,12 @@ class OrangeSegment
       @y += @vy
     end
 
-    # Update graphics
+    # Update image position
     @image.x = @x - @radius
     @image.y = @y - @radius
+
+    # Apply rotation manually
+    @image.rotate = @rotation
   end
 
   # Snap to a socket
@@ -42,10 +46,15 @@ class OrangeSegment
     @locked = true
   end
 
-  # Simple collision check with a socket
+  # Check collision with a socket
   def collide_with_socket?(socket)
     dx = @x - socket.x
     dy = @y - socket.y
     Math.sqrt(dx*dx + dy*dy) <= @radius
+  end
+
+  # Optional: dynamically rotate the segment
+  def rotate!(angle)
+    @rotation += angle
   end
 end
