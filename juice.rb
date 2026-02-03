@@ -12,6 +12,8 @@ Grid.draw if debug
 left_squeezer  = Squeezer.new(680, 600)
 right_squeezer = Squeezer.new(1080, 600)
 
+juice_bursts = []  # can hold multiple juice bursts
+
 # Feeders with initial rotations
 left_feeder    = Feeder.new(725, 300, initial_angle: Math::PI / 1.7)
 right_feeder   = Feeder.new(1045, 300, initial_angle: Math::PI / 2.3)
@@ -28,6 +30,8 @@ hitbox = Hitbox.new(1400, 800, 300, 50, debug: debug)
 
 # Oranges
 oranges = []
+orange spawn_count = 0
+
 orange_segments = []
 oranges << Orange.new(1500, 50)
 oranges << Orange.new(1550, 100)
@@ -133,31 +137,21 @@ update do
       # destroy orange
       o.destroy
 
+      oranges << Orange.new(1550, (rand * 50 ).to_i + 50)
+
+      juice_bursts << Juice.new(o.x, o.y, count: 30)
+
       # spawn segments
       orange_segments.each do |seg|
         # Update segment (falling or locked)
         seg.update
-
-        # Check collision with feeder sockets
-        [left_feeder, right_feeder].each do |feeder|
-          feeder.sockets.each_with_index do |socket, i|
-            next if seg.locked
-            if seg.collide_with_socket?(socket)
-              puts feeder 
-              puts i
-              seg.snap_to(feeder, i)
-            end
-          end
-        end
       end
     end
   end
-  
 
   orange_segments.each do |seg|
     seg.update  # this now moves the image properly
   end
-
 
   # clean up destroyed oranges
   oranges.reject!(&:deleted)
@@ -170,6 +164,12 @@ update do
   hitbox.draw
   left_feeder_hitbox.draw
   right_feeder_hitbox.draw
+
+  # Update all juice bursts
+  juice_bursts.each { |j| j.update(Window.height) }
+
+  # Optionally remove empty bursts if you want
+  juice_bursts.reject! { |j| j.drops.empty? }
 end
 
 show
