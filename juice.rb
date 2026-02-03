@@ -28,6 +28,7 @@ hitbox = Hitbox.new(1400, 800, 300, 50, debug: debug)
 
 # Oranges
 oranges = []
+orange_segments = []
 oranges << Orange.new(1500, 50)
 oranges << Orange.new(1550, 100)
 
@@ -95,15 +96,47 @@ update do
       end
     end
   end
-  
-  # --- Blade collision ---
   oranges.each do |o|
     next if o.deleted
+    
     if blade.collide?(o)
+      sockets = []
+      
+      # find closest socket on each feeder
+      [left_feeder, right_feeder].each do |feeder|
+        closest_socket = feeder.sockets.min_by do |s|
+          dx = o.x - s.x
+          dy = o.y - s.y
+          Math.sqrt(dx * dx + dy * dy)
+        end
+        sockets << closest_socket if closest_socket
+      end
+      
+      # destroy orange
       o.destroy
+
+      orange_segments << OrangeSegment.new(863, 290, 0)
+      orange_segments << OrangeSegment.new(863, 290, Math::PI )
+
+      # spawn segments
+      orange_segments.each do |seg|
+        seg.update
+
+        # Snap to sockets if touching
+        [left_feeder, right_feeder].each do |feeder|
+          feeder.sockets.each do |socket|
+            if !seg.locked && seg.collide_with_socket?(socket)
+              seg.snap_to(socket)
+            end
+          end
+        end
+      end
     end
   end
   
+  # clean up destroyed oranges
+  oranges.reject!(&:deleted)
+  DragHelper.set_draggables(oranges)
   # Remove deleted oranges from arrays + drag helper
   oranges.reject!(&:deleted)
   DragHelper.set_draggables(oranges)
