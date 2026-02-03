@@ -2,15 +2,25 @@
 
 This was the plan I concocted in jspaint. 
 
-The idea was to recreate the juicer in 
+The idea was to create the juicer with 2d graphics.
 
 ![plan](./plan.png)
 
 
+This is my first time using ruby2d
+
+Things I struggled with:
+ - debugging collisions
+ - keeping the codebase clean as I went
+ - slicing an orange in 2 and having the segments actually behave
+
+
 **Note:** MacOS has not been tested.
+https://www.ruby2d.com/learn/get-started/
+
 
 ### Dependencies
-
+On linux there are dependencies to install the gem.
 
 ### Linux
 
