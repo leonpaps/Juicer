@@ -30,7 +30,8 @@ hitbox = Hitbox.new(1400, 800, 300, 50, debug: debug)
 
 # Oranges
 oranges = []
-orange spawn_count = 0
+spawn_count = 0
+
 
 orange_segments = []
 oranges << Orange.new(1500, 50)
@@ -137,7 +138,12 @@ update do
       # destroy orange
       o.destroy
 
-      oranges << Orange.new(1550, (rand * 50 ).to_i + 50)
+      oranges << Orange.new(1450 + (rand * 50 ).to_i , 50)
+      spawn_count += 1
+
+      if spawn_count > 2
+        oranges << Spanner.new(1600, 0 )
+      end
 
       juice_bursts << Juice.new(o.x, o.y, count: 30)
 
