@@ -101,26 +101,35 @@ update do
     next if o.deleted
     
     if blade.collide?(o)
+      # After detecting blade collision and destroying the orange
       sockets = []
-      
-      # find closest socket on each feeder
+
       [left_feeder, right_feeder].each do |feeder|
         closest_socket = feeder.sockets.min_by do |s|
           dx = o.x - s.x
           dy = o.y - s.y
-          Math.sqrt(dx * dx + dy * dy)
+          Math.sqrt(dx*dx + dy*dy)
         end
-        sockets << closest_socket if closest_socket
+        sockets << { feeder: feeder, socket_index: feeder.sockets.index(closest_socket) } if closest_socket
       end
-      
+
+      # Spawn two segments, each locked to its socket
+      orange_segments << OrangeSegment.new(
+        863, 290,
+        rotation: 0,
+        target_feeder: sockets[0][:feeder],
+        socket_index: sockets[0][:socket_index]
+      )
+
+      orange_segments << OrangeSegment.new(
+        880, 300,
+        rotation: Math::PI,
+        target_feeder: sockets[1][:feeder],
+        socket_index: sockets[1][:socket_index]
+      )
+
       # destroy orange
       o.destroy
-
-      # new orange
-      oranges << Orange.new(1550, (rand * 50).to_i + 50)
-
-      orange_segments << OrangeSegment.new(863, 290, 0)
-      orange_segments << OrangeSegment.new(880, 300, 180 )
 
       # spawn segments
       orange_segments.each do |seg|
@@ -132,6 +141,8 @@ update do
           feeder.sockets.each_with_index do |socket, i|
             next if seg.locked
             if seg.collide_with_socket?(socket)
+              puts feeder 
+              puts i
               seg.snap_to(feeder, i)
             end
           end

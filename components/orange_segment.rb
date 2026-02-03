@@ -1,19 +1,18 @@
 require 'ruby2d'
 
 class OrangeSegment
-  attr_accessor :x, :y, :radius, :vy, :locked, :current_socket
+  attr_accessor :x, :y, :radius, :locked
   attr_reader :image
 
-  GRAVITY = 0.5
 
-  def initialize(x, y, rotation = 0, radius: 30)
+  def initialize(x, y, target_feeder:, socket_index:, rotation: 0, radius: 30)
     @x = x
     @y = y
     @radius = radius
-    @vy = 0
     @locked = false
-    @rotation = rotation  # initial rotation in radians
-    @current_socket = nil
+    @rotation = rotation
+    @current_feeder = target_feeder
+    @socket_index = socket_index
 
     # Image
     @image = Image.new(
@@ -23,40 +22,30 @@ class OrangeSegment
       z: 1,
       rotate: @rotation
     )
+
+    # Immediately lock to the socket
+    snap_to_socket!
   end
 
-  def snap_to(feeder, socket_index)
-    @current_feeder = feeder
-    @socket_index = socket_index
+  # Lock to socket
+  def snap_to_socket!
     @locked = true
+    update  # place image at socket immediately
   end
 
   def update
-    if @locked
-      # Move to current socket
-      socket = @current_feeder.sockets[@socket_index]
-      @x = socket.x
-      @y = socket.y
+    return unless @locked
 
-      # Update image position
-      @image.x = @x - @radius
-      @image.y = @y - @radius
+    # Follow the assigned socket
+    socket = @current_feeder.sockets[@socket_index]
+    @x = socket.x
+    @y = socket.y
 
-      # Keep rotation aligned with feeder
-      @image.rotate = @rotation + @current_feeder.angle
-    else
-      # Optionally handle falling logic if needed
-    end
-  end
+    # Update image position
+    @image.x = @x - @radius
+    @image.y = @y - @radius
 
-  def collide_with_socket?(socket)
-    dx = @x - socket.x
-    dy = @y - socket.y
-    Math.sqrt(dx*dx + dy*dy) <= @radius
-  end
-
-  # Optional: dynamically rotate the segment independently
-  def rotate!(angle)
-    @rotation += angle
+    # Align rotation with feeder + initial rotation
+    @image.rotate = @rotation + @current_feeder.angle
   end
 end
