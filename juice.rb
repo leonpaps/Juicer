@@ -1,10 +1,6 @@
 require 'ruby2d'
-require_relative 'components/squeezer'
-require_relative 'components/feeder'
-require_relative 'components/grid'
-require_relative 'components/orange'
-require_relative 'components/hitbox'
-require_relative 'components/drag_helper'
+
+Dir[File.join(__dir__, 'components', '*.rb')].each { |file| require file }
 
 debug = true
 set width: 1780, height: 960, background: 'white'
@@ -15,8 +11,8 @@ Grid.draw if debug
 # Components
 left_squeezer  = Squeezer.new(680, 600)
 right_squeezer = Squeezer.new(1080, 600)
-left_feeder    = Feeder.new(700, 300)
-right_feeder   = Feeder.new(1060, 300)
+left_feeder    = Feeder.new(725, 300)
+right_feeder   = Feeder.new(1045, 300)
 
 # Hitbox
 hitbox = Hitbox.new(1400, 800, 300, 50, debug: debug)
@@ -26,6 +22,9 @@ hitbox2 = Hitbox.new(800, 300, 150, 50, debug: debug)
 oranges = []
 oranges << Orange.new(1500, 50)
 oranges << Orange.new(1550, 100)
+
+# Blade
+Blade.new(880, 400).draw
 
 # Register draggables in DragHelper
 DragHelper.set_draggables(oranges)
