@@ -6,6 +6,12 @@ The idea was to create the juicer with 2d graphics.
 
 ![plan](./plan.png)
 
+What i ended up with:
+
+<p align="center" width="100%">
+<video src="https://github.com/user-attachments/assets/850ce543-5972-49a6-b161-071d52522f7d" width="80%" controls></video>
+</p>
+
 
 This is my first time using ruby2d
 
