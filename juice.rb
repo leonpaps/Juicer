@@ -13,8 +13,8 @@ left_squeezer  = Squeezer.new(680, 600)
 right_squeezer = Squeezer.new(1080, 600)
 
 # Feeders
-left_feeder    = Feeder.new(725, 300)
-right_feeder   = Feeder.new(1045, 300)
+left_feeder    = Feeder.new(725, 300, initial_angle: Math::PI / 1.7)
+right_feeder   = Feeder.new(1045, 300, initial_angle: Math::PI / 2.3)
 
 left_feeder_hitbox  = FeederHitbox.new(left_feeder.cx, left_feeder.cy, 130)
 right_feeder_hitbox = FeederHitbox.new(right_feeder.cx, right_feeder.cy, 130)

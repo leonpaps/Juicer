@@ -3,68 +3,53 @@ require 'ruby2d'
 BASE_RADIUS = 150
 WHITE_RADIUS = 55
 ORANGE_RADIUS = 50
-DEFAULT_OFFSET = 5
+SOCKET_RADIUS = 5
 
 class Feeder
-  attr_accessor :cx, :cy
+  attr_accessor :cx, :cy, :angle, :sockets
 
-  def initialize(cx, cy, offset = DEFAULT_OFFSET)
+  def initialize(cx, cy, initial_angle: 0.0)
     @cx = cx
     @cy = cy
-    @offset = offset
-    @angle = 0.0
+    @angle = initial_angle  # Set initial rotation
 
-    # Base circle (we will rotate this around the pivot)
+    # Base circle (stationary, centered)
     @base = Circle.new(radius: BASE_RADIUS, color: 'orange')
 
     # Small concentric circles at center (pivot)
     @white = Circle.new(radius: WHITE_RADIUS, color: 'white')
     @orange = Circle.new(radius: ORANGE_RADIUS, color: 'orange')
-  end
 
-  # Rotate base circle around pivot (small circles) — direction: :clockwise or :counterclockwise
-  def rotate(direction, speed = 0.05)
-    case direction
-    when :clockwise
-      @angle += speed
-    when :counterclockwise
-      @angle -= speed
+    # 3 sockets (visual only)
+    @socket_angles = [0, 2 * Math::PI / 3, 4 * Math::PI / 3]
+    @sockets = @socket_angles.map do
+      Circle.new(radius: SOCKET_RADIUS, color: '#e56717', z: 2)
     end
   end
 
-  # Draw component
+  # Rotate feeder
+  def rotate(direction, speed = 0.01)
+    @angle += direction == :clockwise ? speed : -speed
+  end
+
+  # Draw everything
   def draw
-    # Pivot center for small concentric circles
+    # Base pivot circles
     @white.x = @cx
     @white.y = @cy
     @orange.x = @cx
     @orange.y = @cy
 
-    # Rotate base circle around pivot
-    offset_x = 0
-    offset_y = -@offset
+    # Base circle (stationary at center)
+    @base.x = @cx
+    @base.y = @cy
 
-    cos_a = Math.cos(@angle)
-    sin_a = Math.sin(@angle)
-
-    rotated_x = cos_a * offset_x - sin_a * offset_y
-    rotated_y = sin_a * offset_x + cos_a * offset_y
-
-    @base.x = @cx + rotated_x
-    @base.y = @cy + rotated_y
+    # Sockets rotate around the edge
+    @sockets.each_with_index do |socket, i|
+      angle = @angle + @socket_angles[i]
+      socket.x = @cx + BASE_RADIUS * Math.cos(angle)
+      socket.y = @cy + BASE_RADIUS * Math.sin(angle)
+    end
   end
 end
 
-# --- Standalone run ---
-if __FILE__ == $0
-  set width: 800, height: 800, background: 'white'
-
-  feeder = Feeder.new(400, 400)
-
-  update do
-    feeder.rotate(:clockwise)
-    feeder.draw
-  end
-
-  show
-end

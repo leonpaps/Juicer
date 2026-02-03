@@ -16,7 +16,7 @@ class FeederHitbox
         y: @cy,
         radius: @radius,
         color: 'green',
-        z: 10,
+        z: -1,
         sectors: 64
       )
     end
