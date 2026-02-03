@@ -43,5 +43,5 @@ Running the App
 
 Simply run:
 
-ruby juice.rb
+`ruby juice.rb`
 
