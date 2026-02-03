@@ -118,14 +118,16 @@ update do
         863, 290,
         rotation: 0,
         target_feeder: sockets[0][:feeder],
-        socket_index: sockets[0][:socket_index]
+        socket_index: sockets[0][:socket_index],
+        initial_vx: -5
       )
 
       orange_segments << OrangeSegment.new(
         880, 300,
         rotation: Math::PI,
         target_feeder: sockets[1][:feeder],
-        socket_index: sockets[1][:socket_index]
+        socket_index: sockets[1][:socket_index],
+        initial_vx: 5
       )
 
       # destroy orange
