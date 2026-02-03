@@ -1,23 +1,31 @@
 require 'ruby2d'
 require_relative 'components/squeezer'
+require_relative 'components/feeder'
 require_relative 'components/grid'
 
 debug = true   # Toggle this to show/hide the grid
 
-set width: 1280, height: 960, background: 'white'
+set width: 1780, height: 960, background: 'white'
 
 Grid.draw if debug
 
-# Example squeezers
-left  = Squeezer.new(280, 600)
-right = Squeezer.new(680, 600)
+left_squeezer  = Squeezer.new(680, 600)
+right_squeezer = Squeezer.new(1080, 600)
+
+left_feeder  = Feeder.new(700, 300)
+right_feeder = Feeder.new(1060, 300)
 
 update do
-  left.rotate(:counterclockwise)
-  right.rotate(:clockwise)
+  left_squeezer.rotate(:counterclockwise)
+  right_squeezer.rotate(:clockwise)
 
-  left.draw
-  right.draw
+  left_feeder.rotate(:clockwise)
+  right_feeder.rotate(:counterclockwise)
+
+  left_feeder.draw
+  right_feeder.draw
+  left_squeezer.draw
+  right_squeezer.draw
 end
 
 show
