@@ -1,14 +1,14 @@
 require 'ruby2d'
 
 class Orange
-  attr_accessor :x, :y, :radius, :vy, :following_socket
+  attr_accessor :x, :y, :radius, :vy, :following_socket, :deleted
 
   GRAVITY = 0.5
   SHADOW_OFFSET_X = 6
   SHADOW_OFFSET_Y = 6
   SHADOW_COLOR = [0, 0, 0, 0.25]
 
-  def initialize(x, y, radius = 30)
+  def initialize(x, y, radius = 38)
     @x = x
     @y = y
     @radius = radius
@@ -16,6 +16,8 @@ class Orange
     @dragging = false
     @falling = true
     @following_socket = nil
+    @deleted = false
+
 
     @shadow = Circle.new(x: @x + SHADOW_OFFSET_X, y: @y + SHADOW_OFFSET_Y, radius: @radius, color: SHADOW_COLOR, z: 0)
     @circle = Circle.new(x: @x, y: @y, radius: @radius, color: 'orange', z: 1)
@@ -25,6 +27,13 @@ class Orange
     dx = mx - @x
     dy = my - @y
     Math.sqrt(dx*dx + dy*dy) <= @radius
+  end
+
+  def destroy
+    return if @deleted
+    @deleted = true
+    @circle.remove
+    @shadow.remove
   end
 
   def stop_falling; @falling = false; end

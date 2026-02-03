@@ -32,7 +32,8 @@ oranges << Orange.new(1500, 50)
 oranges << Orange.new(1550, 100)
 
 # Blade
-Blade.new(880, 400).draw
+blade = Blade.new(883, 360)
+blade.draw
 
 # Register draggables in DragHelper
 DragHelper.set_draggables(oranges)
@@ -54,13 +55,13 @@ update do
   right_squeezer.rotate(:clockwise)
   left_feeder.rotate(:clockwise)
   right_feeder.rotate(:counterclockwise)
-
+  
   # Draw everything
   left_feeder.draw
   right_feeder.draw
   left_squeezer.draw
   right_squeezer.draw
-
+  
   # Update oranges with gravity
   oranges.each do |o|
     if hitbox.collide?(o)
@@ -70,16 +71,16 @@ update do
       o.update(Float::INFINITY)
     end
   end
-
+  
   # Snap oranges to feeder sockets
   oranges.each do |o|
     next if o.following_socket # Already attached
-
+    
     # Feeder hitbox ONLY disables falling
     if left_feeder_hitbox.collide?(o) || right_feeder_hitbox.collide?(o)
       o.stop_falling
     end
-
+    
     [left_feeder, right_feeder].each do |f|
       f.sockets.each do |s|
         dx = o.x - s.x
@@ -94,7 +95,19 @@ update do
       end
     end
   end
-
+  
+  # --- Blade collision ---
+  oranges.each do |o|
+    next if o.deleted
+    if blade.collide?(o)
+      o.destroy
+    end
+  end
+  
+  # Remove deleted oranges from arrays + drag helper
+  oranges.reject!(&:deleted)
+  DragHelper.set_draggables(oranges)
+  
   # Draw hitboxes (debug only)
   hitbox.draw
   left_feeder_hitbox.draw
