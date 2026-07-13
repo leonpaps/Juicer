@@ -1,6 +1,8 @@
 # Juicer
 
-This was the plan I concocted in jspaint. 
+I build this as a submission for a code challange. 
+
+This was the plan I concocted in jspaint. (Side note [jspaint.app](jspaint.app) is awesome, I didn't build it but I love to share the word)
 The idea was to create the juicer with 2d graphics.
 
 ![plan](./plan.png)
